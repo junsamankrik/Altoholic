@@ -50,15 +50,15 @@ end
 
 local function ShowOptionsCategory(self)
 	addon:ToggleUI()
-	InterfaceOptionsFrame_OpenToCategory(self.value)
+	Settings.OpenToCategory(self.value)
 end
 
 local function ResetAllData_MsgBox_Handler(self, button)
 	if not button then return end
-	
+
 	DataStore:ClearAllData()
 	addon:Print(L["Information saved in DataStore has been completely deleted !"])
-	
+
 	-- rebuild the main character table, and all the menus
 	addon.Characters:InvalidateView()
 	addon.Summary:Update()
@@ -104,7 +104,7 @@ end
 
 local function LevelIcon_Initialize(frame, level)
 	local option = addon:GetOption(OPTION_LEVELS)
-	
+
 	frame:AddTitle(L["FILTER_LEVELS"])
 	frame:AddButtonWithArgs(ALL, 1, OnLevelFilterChange, 1, 60, (option == 1))
 	frame:AddTitle()
@@ -120,7 +120,7 @@ local function ProfessionsIcon_Initialize(frame, level)
 
 	local tradeskills = addon.TradeSkills.AccountSummaryFiltersSpellIDs
 	local option = addon:GetOption(OPTION_TRADESKILL)
-	
+
 	if level == 1 then
 		frame:AddTitle(L["FILTER_PROFESSIONS"])
 		frame:AddButton(ALL, 0, OnTradeSkillFilterChange, nil, (option == 0))
@@ -128,21 +128,21 @@ local function ProfessionsIcon_Initialize(frame, level)
 		frame:AddCategoryButton(PRIMARY_SKILLS, 1, level)
 		frame:AddCategoryButton(SECONDARY_SKILLS, 2, level)
 		frame:AddCloseMenu()
-	
+
 	elseif level == 2 then
 		local spell, icon, _
 		local firstSecondarySkill = addon.TradeSkills.AccountSummaryFirstSecondarySkillIndex
-	
+
 		if frame:GetCurrentOpenMenuValue() == 1 then				-- Primary professions
 			for i = 1, (firstSecondarySkill - 1) do
 				spell, _, icon = GetSpellInfo(tradeskills[i])
 				frame:AddButton(spell, i, OnTradeSkillFilterChange, icon, (option == i), level)
 			end
-		
+
 		elseif frame:GetCurrentOpenMenuValue() == 2 then		-- Secondary professions
 			for i = firstSecondarySkill, #tradeskills do
 				spell, _, icon = GetSpellInfo(tradeskills[i])
-				
+
 				frame:AddButton(spell, i, OnTradeSkillFilterChange, icon, (option == i), level)
 			end
 		end
@@ -151,15 +151,15 @@ end
 
 local function ClassIcon_Initialize(frame, level)
 	local option = addon:GetOption(OPTION_CLASSES)
-	
+
 	frame:AddTitle(L["FILTER_CLASSES"])
 	frame:AddButton(ALL, 0, OnClassFilterChange, nil, (option == 0))
 	frame:AddTitle()
-	
+
 	-- See constants.lua
 	for key, value in ipairs(CLASS_SORT_ORDER) do
 		frame:AddButton(
-			format("|c%s%s", RAID_CLASS_COLORS[value].colorStr, LOCALIZED_CLASS_NAMES_MALE[value]), 
+			format("|c%s%s", RAID_CLASS_COLORS[value].colorStr, LOCALIZED_CLASS_NAMES_MALE[value]),
 			key, OnClassFilterChange, nil, (option == key)
 		)
 	end
@@ -175,9 +175,9 @@ local function AltoholicOptionsIcon_Initialize(frame, level)
 	frame:AddButton(MISCELLANEOUS, AltoholicMiscOptions, ShowOptionsCategory)
 	frame:AddButton(SEARCH, AltoholicSearchOptions, ShowOptionsCategory)
 	frame:AddButton(L["Tooltip"], AltoholicTooltipOptions, ShowOptionsCategory)
-	
+
 	frame:AddTitle()
-	frame:AddTitle(OTHER)	
+	frame:AddTitle(OTHER)
 	frame:AddButton("What's new?", AltoholicWhatsNew, ShowOptionsCategory)
 	frame:AddButton("Getting support", AltoholicSupport, ShowOptionsCategory)
 	frame:AddButton(L["Memory used"], AltoholicMemoryOptions, ShowOptionsCategory)
@@ -195,13 +195,13 @@ local addonList = {
 
 local function DataStoreOptionsIcon_Initialize(frame, level)
 	frame:AddTitle(format("%s: %s", GAMEOPTIONS_MENU, "DataStore"))
-	
+
 	for _, module in ipairs(addonList) do
 		if _G[module] then	-- only add loaded modules
 			frame:AddButton(module, module, ShowOptionsCategory)
 		end
 	end
-	
+
 	frame:AddTitle()
 	frame:AddButton(L["Reset all data"], nil, ResetAllData)
 	frame:AddButton(HELP_LABEL, DataStoreHelp, ShowOptionsCategory)
@@ -221,9 +221,9 @@ local menuIconCallbacks = {
 addon:Controller("AltoholicUI.TabSummaryIcon", {
 	Icon_OnEnter = function(frame)
 		local currentMenuID = frame:GetID()
-		
+
 		local menu = frame:GetParent().ContextualMenu
-		
+
 		menu:Initialize(menuIconCallbacks[currentMenuID], "LIST")
 		menu:Close()
 		menu:Toggle(frame, 0, 0)
